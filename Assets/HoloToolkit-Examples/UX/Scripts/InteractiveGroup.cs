@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,16 +10,17 @@ namespace HoloToolkit.Examples.InteractiveElements
     [RequireComponent(typeof(InteractiveSet))]
     public class InteractiveGroup : MonoBehaviour
     {
+        [Tooltip("Gameobject containing GridLayoutGroup")]
+        public GameObject Grid;
+
         [Tooltip("Prefab for your interactive.")]
         public GameObject InteractivePrefab;
 
+        [Tooltip("scale for new instance of InteractivePrefab")]
+        public Vector3 PrefabScale = new Vector3(2000, 2000, 2000);
+
         [Tooltip("Data to fill the InteractiveSet.")]
         public List<string> Titles = new List<string>();
-
-        [Tooltip("number of elements after which we start a new column")]
-        public int Rows = 3;
-
-        public Vector2 Offsets = new Vector2(0.00f, 0.00f);
 
         private void Start()
         {
@@ -56,7 +60,8 @@ namespace HoloToolkit.Examples.InteractiveElements
         {
             for (int i = Interactives.Count; i < Titles.Count; i++)
             {
-                GameObject PrefabInst = Instantiate(InteractivePrefab, gameObject.transform) as GameObject;
+                GameObject PrefabInst = Instantiate(InteractivePrefab, Grid.transform) as GameObject;
+                PrefabInst.transform.localScale = PrefabScale;
                 InteractiveToggle InterInst = PrefabInst.GetComponent<InteractiveToggle>();
                 if (InterInst == null)
                 {
@@ -78,30 +83,13 @@ namespace HoloToolkit.Examples.InteractiveElements
             RemoveInteractives(Titles.Count);
             CreateInteractives();
 
-            int rows = System.Math.Min(Rows, Titles.Count);
-            int columns = (Titles.Count - 1) / Rows + 1;
-
             for (int i = 0; i < Interactives.Count; i++)
             {
-                // set title
+                // Set title
                 string title = Titles[i];
                 Interactive interactive = Interactives[i];
                 interactive.SetTitle(title);
                 interactive.Keyword = title;
-                
-                // layouting
-                int j = i % rows;
-
-                Vector2 Distance = new Vector2(Offsets.x, Offsets.y);
-                Collider collider = interactive.gameObject.GetComponent<Collider>();
-                if (collider != null)
-                {
-                    Distance.x += collider.bounds.size.x;
-                    Distance.y += collider.bounds.size.y;
-                }
-                interactive.gameObject.transform.localPosition = new Vector3(
-                    ((i / rows) - ((columns - 1) * 0.5f)) * Distance.x,
-                    -(j - (rows - 1) * 0.5f) * Distance.y);
             }
             GetInteractiveSet().SelectedIndices.Clear();
             GetInteractiveSet().UpdateInteractives();
@@ -114,9 +102,9 @@ namespace HoloToolkit.Examples.InteractiveElements
  
 
         /// <summary>
-        /// remove unused Interactives from scene
+        /// Remove unused Interactives from scene
         /// </summary>
-        /// <param name="keep">number of Iteractives that will NOT be deleted</param>
+        /// <param name="keep">Number of Interactives that will NOT be deleted</param>
         private void RemoveInteractives(int keep = 0)
         {
             for (int i = Interactives.Count - 1; i >= keep; i--)

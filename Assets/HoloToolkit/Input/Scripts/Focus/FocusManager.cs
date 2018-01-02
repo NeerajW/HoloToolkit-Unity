@@ -629,7 +629,8 @@ namespace HoloToolkit.Unity.InputModule
             }
 
             // Check if we need to overwrite the physics raycast info
-            if ((pointer.End.Object == null || overridePhysicsRaycast) && uiRaycastResult.isValid && uiRaycastResult.module.eventCamera == UIRaycastCamera)
+            if ((pointer.End.Object == null || overridePhysicsRaycast) && uiRaycastResult.isValid && 
+			     uiRaycastResult.module != null && uiRaycastResult.module.eventCamera == UIRaycastCamera)
             {
                 newUiRaycastPosition.x = uiRaycastResult.screenPosition.x;
                 newUiRaycastPosition.y = uiRaycastResult.screenPosition.y;
@@ -649,7 +650,7 @@ namespace HoloToolkit.Unity.InputModule
 
         private bool RaycastUnityUIStep(PointerData pointer, RayStep step, LayerMask[] prioritizedLayerMasks, out bool overridePhysicsRaycast, out RaycastResult uiRaycastResult)
         {
-            // Move the uiRaycast camera to the the current pointer's position.
+            // Move the uiRaycast camera to the current pointer's position.
             UIRaycastCamera.transform.position = step.origin;
             UIRaycastCamera.transform.forward = step.direction;
 
@@ -694,7 +695,7 @@ namespace HoloToolkit.Unity.InputModule
                         }
                     }
                 }
-                // If we've hit somthing, no need to go further
+                // If we've hit something, no need to go further
                 return true;
             }
             // If we haven't hit something, keep going
